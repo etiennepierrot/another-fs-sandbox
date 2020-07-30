@@ -14,12 +14,13 @@ let rec allFiles dirs =
 
 let readFile path =
     let isExcludeWord word = 
-        [|"public" ;"private"; "protected"; "new"; "return"; "readonly"; "await"; "async"; "get";"set"; "class"; "using"; "namespace"; "var"|] 
+        [|"public" ;"private"; "protected"; "new"; "return"; "readonly"; "await"; "async"; "get";"set"; "class"; "using"; "namespace"; "var"; "static"; "void"; "task"; "cancellationtoken"; "if"|] 
         |> Array.contains word
     File.ReadAllLines(path) 
-    |> Seq.filter(fun l -> not (l.StartsWith("//"))) 
-    |> Seq.collect(fun l -> l.Split([|' ';'\n';'\t';',';'.';'/';'\\';'|';':';';';'{';'}'; '(';')';'='; '<'; '>'|], StringSplitOptions.RemoveEmptyEntries))
+    |> Seq.filter(fun l -> not (l.TrimStart().StartsWith(@"//"))) 
+    |> Seq.collect(fun l -> l.Split([|' ';'\n';'\t';',';'.';'/';'\\';'|';':';';';'{';'}'; '(';')'; '['; ']';'='; '<'; '>'|], StringSplitOptions.RemoveEmptyEntries))
     |> Seq.filter( String.IsNullOrWhiteSpace >> not)
+    |> Seq.map( fun x -> x.ToLowerInvariant())
     |> Seq.filter(isExcludeWord >> not )
     |> Seq.toArray
 
