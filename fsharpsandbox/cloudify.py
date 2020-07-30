@@ -17,13 +17,13 @@ d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 text = open(path.join(d, 'words.txt')).read()
 
 # Generate a word cloud image
-wordcloud = WordCloud().generate(text)
+# wordcloud = WordCloud().generate(text)
 
 # Display the generated image:
 # the matplotlib way:
 import matplotlib.pyplot as plt
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
+# plt.imshow(wordcloud, interpolation='bilinear')
+# plt.axis("off")
 
 # lower max_font_size
 wordcloud = WordCloud(max_font_size=40).generate(text)
