@@ -1,6 +1,4 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open System
+﻿open System
 open System.IO
 
 let directory = "/Users/etienne.pierrot/repos/issuing/api/src/Issuing.ControlAssessment.Api/Control/Domain"
@@ -11,35 +9,45 @@ let rec allFiles dirs =
     if Seq.isEmpty dirs then Seq.empty else
         seq { yield! dirs |> Seq.collect (Directory.EnumerateFiles >> Seq.filter isSourceFile )
               yield! dirs |> Seq.collect Directory.EnumerateDirectories |> allFiles }
+ 
+let (|Prefix|_|) (p:string) (s:string) =
+    if s.StartsWith(p) then
+        Some(s.Substring(p.Length))
+    else
+        None
 
 let readFile path =
-    let isExcludeWord word = 
-        [|"public" ;"private"; "protected"; "new"; "return"; "readonly"; "await"; "async"; "get";"set"; "class"; "using"; "namespace"; "var"; "static"; "void"; "task"; "cancellationtoken"; "if"|] 
-        |> Array.contains word
-    File.ReadAllLines(path) 
-    |> Seq.filter(fun l -> not (l.TrimStart().StartsWith(@"//"))) 
-    |> Seq.collect(fun l -> l.Split([|' ';'\n';'\t';',';'.';'/';'\\';'|';':';';';'{';'}'; '(';')'; '['; ']';'='; '<'; '>'|], StringSplitOptions.RemoveEmptyEntries))
-    |> Seq.filter( String.IsNullOrWhiteSpace >> not)
-    |> Seq.map( fun x -> x.ToLowerInvariant())
-    |> Seq.filter(isExcludeWord >> not )
-    |> Seq.toArray
+    let isLineToParse (line :string)  =
+        match line.TrimStart() with 
+        | "" -> false
+        | Prefix @"//" rest -> false
+        | Prefix "using" rest -> false
+        | _ -> true  
 
-type Occurence = {
-    Word : string
-    Count : int
-}
+    let isExcludeWord word = 
+        [|"public" ;"private"; "protected"; 
+        "new"; "return"; "readonly"; "await"; "async"; "get"; "set"; "class"; "using"; "namespace"; "var"; "static"; "void";
+        "task"; "cancellationtoken"; 
+        "if"; "bool"; 
+        "string"; "ulong"; "dynamic"|] 
+        |> Array.contains word
+
+    let splitLineIntoWords (line :string) = 
+        line.Split([|' ';'\n';'\t';',';'.';'/';'\\';'|';':';';';'{';'}'; '(';')'; '['; ']';'='; '<'; '>'; '"'|], StringSplitOptions.RemoveEmptyEntries)
+
+    File.ReadAllLines(path) 
+    |> Seq.map( fun x -> x.ToLowerInvariant())
+    |> Seq.filter isLineToParse
+    |> Seq.collect splitLineIntoWords
+    |> Seq.filter(isExcludeWord >> not )
 
 let collectWord path =
     allFiles [|path|] 
         |> Seq.collect readFile
-        |> Seq.countBy id
-        |> Seq.sortBy (fun (_, c) -> c)
-        |> Seq.toList
-        |> List.iter( fun (word, count) -> printfn "%s : %d" word count   )
-
+        |> Seq.iter( fun (word) -> printfn "%s " word   )
 
 
 [<EntryPoint>]
 let main argv =
-    collectWord( "/Users/etienne.pierrot/repos/issuing/api/src/Issuing.ControlAssessment.Api/" )
+    collectWord( "/Users/etienne.pierrot/repos/issuing/api/src/Issuing.ControlAssessment.Api/Control/Domain" )
     0 // return an integer exit code
