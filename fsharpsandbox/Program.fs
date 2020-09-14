@@ -26,46 +26,49 @@ let main argv =
         let handler1 = new HttpClientHandler (UseCookies = false)
         let baseUri = Uri("http://localhost:5041/")
         let handler2 = new LoggingHandler(handler1)
-        use httpClient = new HttpClient(handler2, true, BaseAddress=baseUri)
+        let httpClient = new HttpClient(handler2, true, BaseAddress=baseUri)
         httpClient.DefaultRequestHeaders.Authorization <- Headers.AuthenticationHeaderValue("Bearer", accessToken)
-        ClientApi.Client(httpClient)
+        httpClient
 
     //let cardProduct = GetBasicCredentials |> GetAccessToken "partner" |> CreateCardProduct
     let accessToken = GetBasicCredentials |> GetAccessToken "client"
     printfn "access_token : %s" accessToken
     
     
-    let address = ClientApi.Address(
-                        AddressLine1 =  "3 rue des cottages",
-                        AddressLine2 =  "3 rue des cottages",
-                        City =  "Paris",
-                        Zip = "75018",
-                        State = "France",
-                        Country = "FR")
+    let address = ClientApi.Schemas.Address(
+                        address_line1 =  "3 rue des cottages",
+                        address_line2 =  Some "3 rue des cottages",
+                        city =  "Paris",
+                        zip = "75018",
+                        state = Some "France",
+                        country = "FR")
      
     let client = createClient accessToken               
     task {
-        let addAccount = ClientApi.``add-account-request``("EUR", "fake account") 
-        let! account = client.PostAccounts(addAccount)
-        let addAccountHolder = ClientApi.``add-account-holder-request``(
-                                AccountId = account.Id, 
-                                Type = "individual", 
-                                FirstName = "etienne",
-                                LastName = "pierrot",
-                                BillingAddress = address
-                            ) 
-        let! accountHolder = client.PostAccountHolders(addAccountHolder)
 
-        let addCard = ClientApi.``add-card-request``(
-                        Type = "virtual",
-                        AccountId = account.Id,
-                        AccountHolderId = accountHolder.Id
-                    )
-        let! card = client.PostCards(addCard)
+        let addAccount = ClientApi.Schemas.``add-account-request``("EUR",  Some "fake account").ToJson()
+        let contentAddAccount = new StringContent(addAccount, Text.Encoding.UTF8, "application/json")
+        let! response = client.PostAsync( "/accounts", contentAddAccount)
+        let! content = response.Content.ReadAsStringAsync()
+        let account = ClientApi.Schemas.``add-account-response``.Parse(content)
+
+        let addAccountHolder = ClientApi.Schemas.``add-individual-account-holder-request``(
+                                    account_id = Some account.Id,
+                                    ``type`` = "individual",
+                                    first_name = Some "etienne",
+                                    last_name = Some "pierrot",
+                                    billing_address = address
+                                ).ToJson()
+
+        let contentAddAccountHolder = new StringContent(addAccountHolder, Text.Encoding.UTF8, "application/json")
+        let! response = client.PostAsync( "/account-holders", contentAddAccountHolder)
+        let! content = response.Content.ReadAsStringAsync()
+        let accountHolder = ClientApi.Schemas.``add-account-holder-response``.Parse(content)
+
+       
 
         printfn "account_id : %s" account.Id
         printfn "account_holder_id : %s" accountHolder.Id
-        printfn "card_id : %s" card.Id
      
     }
     |> Async.AwaitTask
