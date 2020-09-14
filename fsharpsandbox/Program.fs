@@ -1,53 +1,75 @@
-﻿open System
-open System.IO
+﻿open Cloudify
+open System
+open System.Net.Http
+open SwaggerProvider
+open OpenAPITypeProvider
+open OAuth
+open CardProduct
+open FSharp.Control.Tasks.V2
+open System.Net.Http.Headers;
 
-let directory = "/Users/etienne.pierrot/repos/issuing/api/src/Issuing.ControlAssessment.Api/Control/Domain"
+//let [<Literal>] Schema = "/Users/etienne.pierrot/repos/issuing/openapi/src/OpenApiGenerator/output/openapi.yaml"
+type ClientApi = OpenAPIV3Provider<"/Users/etienne.pierrot/repos/issuing/openapi/src/OpenApiGenerator/output/openapi.yaml">
 
-//http://www.fssnip.net/pi/title/Recursively-find-all-files-from-a-sequence-of-directories
-let rec allFiles dirs =
-    let isSourceFile (filename:string) = filename.EndsWith(".cs")
-    if Seq.isEmpty dirs then Seq.empty else
-        seq { yield! dirs |> Seq.collect (Directory.EnumerateFiles >> Seq.filter isSourceFile )
-              yield! dirs |> Seq.collect Directory.EnumerateDirectories |> allFiles }
- 
-let (|Prefix|_|) (p:string) (s:string) =
-    if s.StartsWith(p) then
-        Some(s.Substring(p.Length))
-    else
-        None
-
-let readFile path =
-    let isLineToParse (line :string)  =
-        match line.TrimStart() with 
-        | "" -> false
-        | Prefix @"//" rest -> false
-        | Prefix "using" rest -> false
-        | _ -> true  
-
-    let isExcludeWord word = 
-        [|"public" ;"private"; "protected"; 
-        "new"; "return"; "readonly"; "await"; "async"; "get"; "set"; "class"; "using"; "namespace"; "var"; "static"; "void";
-        "task"; "cancellationtoken"; 
-        "if"; "bool"; 
-        "string"; "ulong"; "dynamic"|] 
-        |> Array.contains word
-
-    let splitLineIntoWords (line :string) = 
-        line.Split([|' ';'\n';'\t';',';'.';'/';'\\';'|';':';';';'{';'}'; '(';')'; '['; ']';'='; '<'; '>'; '"'|], StringSplitOptions.RemoveEmptyEntries)
-
-    File.ReadAllLines(path) 
-    |> Seq.map( fun x -> x.ToLowerInvariant())
-    |> Seq.filter isLineToParse
-    |> Seq.collect splitLineIntoWords
-    |> Seq.filter(isExcludeWord >> not )
-
-let collectWord path =
-    allFiles [|path|] 
-        |> Seq.collect readFile
-        |> Seq.iter( fun (word) -> printfn "%s " word   )
-
+type LoggingHandler(messageHandler) =
+    inherit DelegatingHandler(messageHandler)
+    override __.SendAsync(request, cancellationToken) =
+        // Put break point here is want to debug HTTP calls
+        let body = request.Content.ReadAsStringAsync()|> Async.AwaitTask |> Async.RunSynchronously
+        printfn "[%A]: %A %s" request.Method request.RequestUri body
+        base.SendAsync(request, cancellationToken)
 
 [<EntryPoint>]
 let main argv =
-    collectWord( "/Users/etienne.pierrot/repos/issuing/api/src/Issuing.ControlAssessment.Api/Control/Domain" )
+    
+    let createClient accessToken= 
+        let handler1 = new HttpClientHandler (UseCookies = false)
+        let baseUri = Uri("http://localhost:5041/")
+        let handler2 = new LoggingHandler(handler1)
+        use httpClient = new HttpClient(handler2, true, BaseAddress=baseUri)
+        httpClient.DefaultRequestHeaders.Authorization <- Headers.AuthenticationHeaderValue("Bearer", accessToken)
+        ClientApi.Client(httpClient)
+
+    //let cardProduct = GetBasicCredentials |> GetAccessToken "partner" |> CreateCardProduct
+    let accessToken = GetBasicCredentials |> GetAccessToken "client"
+    printfn "access_token : %s" accessToken
+    
+    
+    let address = ClientApi.Address(
+                        AddressLine1 =  "3 rue des cottages",
+                        AddressLine2 =  "3 rue des cottages",
+                        City =  "Paris",
+                        Zip = "75018",
+                        State = "France",
+                        Country = "FR")
+     
+    let client = createClient accessToken               
+    task {
+        let addAccount = ClientApi.``add-account-request``("EUR", "fake account") 
+        let! account = client.PostAccounts(addAccount)
+        let addAccountHolder = ClientApi.``add-account-holder-request``(
+                                AccountId = account.Id, 
+                                Type = "individual", 
+                                FirstName = "etienne",
+                                LastName = "pierrot",
+                                BillingAddress = address
+                            ) 
+        let! accountHolder = client.PostAccountHolders(addAccountHolder)
+
+        let addCard = ClientApi.``add-card-request``(
+                        Type = "virtual",
+                        AccountId = account.Id,
+                        AccountHolderId = accountHolder.Id
+                    )
+        let! card = client.PostCards(addCard)
+
+        printfn "account_id : %s" account.Id
+        printfn "account_holder_id : %s" accountHolder.Id
+        printfn "card_id : %s" card.Id
+     
+    }
+    |> Async.AwaitTask
+    |> Async.RunSynchronously    
+
+    // client.
     0 // return an integer exit code
