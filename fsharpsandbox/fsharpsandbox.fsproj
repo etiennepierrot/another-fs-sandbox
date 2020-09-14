@@ -6,6 +6,9 @@
   <ItemGroup>
     <Compile Include="Cloudify.fs" />
     <Compile Include="Oauth.fs" />
+    <Compile Include="ClientInterface.fs" />
+    <Compile Include="SampleData.fs" />
+    <Compile Include="HttpClient.fs" />
     <Compile Include="CardProduct.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
