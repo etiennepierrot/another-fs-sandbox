@@ -6,14 +6,25 @@ open FSharp.Control.Tasks.V2
 open ClientInterface
 open HttpClient
 
+let createCardProduct clientId = 
+        let (partnerCredential, _) =  "partner"  |> GetBasicCredentials 
+        GetAccessToken "partner" partnerCredential |> CreateCardProduct clientId
+
 [<EntryPoint>]
 let main argv =
+    //let (credentials, clientId) = GetBasicCredentials "client"
+    let (credentials, clientId) = (
+        "YWNrX3RrbnFsM2M2ejdkdWhwNTZnaG5jcDVxaWl5OjAwODc3YTM1NmIwZTQyNDNhMDg3ZDk0MWNhMmFlNmMx", 
+        "cli_cinthp2libse5ept2xz6p3uxbi")
+   
+    printfn "client_id : %s " clientId
+    printfn "credentials : %s " credentials
+    let accessToken = GetAccessToken "client" credentials
+    printfn "accessToken : %s " accessToken
     
-    //let cardProduct = GetBasicCredentials |> GetAccessToken "partner" |> CreateCardProduct
-    let accessToken = GetBasicCredentials |> GetAccessToken "client"
-    printfn "access_token : %s" accessToken
     
-    let client = CreateClient accessToken "http://localhost:5041/"              
+
+    let client = CreateHttpClient accessToken "http://localhost:5041/"   
     task {
 
         let addAccount = SampleData.AddAccount.ToJson()
@@ -26,6 +37,7 @@ let main argv =
         printfn "account_id : %s" account.Id
         printfn "account_holder_id : %s" accountHolder.Id
         printfn "card_id : %s" card.Id
+        printfn ""
      
     }
     |> Async.AwaitTask

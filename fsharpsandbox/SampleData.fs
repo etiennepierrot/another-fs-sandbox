@@ -17,8 +17,7 @@ module SampleData
                                         first_name = Some "etienne",
                                         last_name = Some "pierrot",
                                         billing_address = Address
-                                    )
-                                   
+                                    )                                   
     
     let AddCard accountId accountHolderId = ClientApi.Schemas.``add-card-request``(
                                                 account_id =  accountId,

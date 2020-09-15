@@ -1,6 +1,7 @@
 module HttpClient
     open System.Net.Http
     open System
+    
 
     type LoggingHandler(messageHandler) =
         inherit DelegatingHandler(messageHandler)
@@ -10,7 +11,7 @@ module HttpClient
             printfn "[%A]: %A %s" request.Method request.RequestUri body
             base.SendAsync(request, cancellationToken)
 
-    let CreateClient accessToken uri = 
+    let CreateHttpClient accessToken uri = 
         let handler1 = new HttpClientHandler (UseCookies = false)
         let handler2 = new LoggingHandler(handler1)
         let httpClient = new HttpClient(handler2, true, BaseAddress=Uri(uri))

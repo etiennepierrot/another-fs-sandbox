@@ -4,12 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Cloudify.fs" />
-    <Compile Include="Oauth.fs" />
-    <Compile Include="ClientInterface.fs" />
+    <Compile Include="Cloudify/Cloudify.fs" />
+    <Compile Include="ClientSDK/Oauth.fs" />
+    <Compile Include="ClientSDK/ClientInterface.fs" />
+    <Compile Include="ClientSDK/HttpClient.fs" />
+    <Compile Include="ClientSDK/CardProduct.fs" />
     <Compile Include="SampleData.fs" />
-    <Compile Include="HttpClient.fs" />
-    <Compile Include="CardProduct.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
