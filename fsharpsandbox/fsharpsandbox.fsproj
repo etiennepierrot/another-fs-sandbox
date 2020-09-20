@@ -18,5 +18,6 @@
     <PackageReference Include="SwaggerProvider" Version="0.10.7" />
     <PackageReference Include="TaskBuilder.fs" Version="2.1.0" />
     <PackageReference Include="OpenAPITypeProvider" Version="2.3.0" />
+    <PackageReference Include="JustSaying" Version="6.0.5" />
   </ItemGroup>
 </Project>

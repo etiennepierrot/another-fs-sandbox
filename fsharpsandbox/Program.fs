@@ -5,8 +5,17 @@ open CardProduct
 open FSharp.Control.Tasks.V2
 open ClientInterface
 open HttpClient
-open ClientInterface
+open JustSaying.Messaging
+open JustSaying.Messaging.MessageHandling
 
+
+type Handler() = 
+    interface IHandlerAsync<string> with 
+        member this.Handle s = 
+            task {
+                printfn "%s" s
+                return true
+            }
 let createCardProduct clientId = 
         let (partnerCredential, _) =  "partner"  |> GetBasicCredentials 
         GetAccessToken "partner" partnerCredential |> CreateCardProduct clientId
@@ -29,14 +38,14 @@ let main argv =
         let! account = PostAccount addAccount client
         let addAccountHolder = SampleData.AddAccountHolder account.Id
         let! accountHolder = PostAccountHolder addAccountHolder client 
-        let addCard = SampleData.AddCard account.Id accountHolder.Id
-        let! card = PostCard addCard client
+        let addVirtualCard = SampleData.AddVirtualCard account.Id accountHolder.Id
+        let! card = PostVirtualCard addVirtualCard client
         let addPhysicalCard = SampleData.AddPhysicalCard account.Id accountHolder.Id
         let! physicalCard = PostPhysicalCard addPhysicalCard client
 
         printfn "account_id : %s" account.Id
         printfn "account_holder_id : %s" accountHolder.Id
-        printfn "card_id : %s" card.Id
+        printfn "virtual card_id : %s" card.Id
         printfn "physical card_id : %s" physicalCard.Id
     }
     |> Async.AwaitTask

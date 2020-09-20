@@ -23,11 +23,11 @@ module SampleData
                                         billing_address = Address
                                         )                                  
     
-    let AddCard accountId accountHolderId = ClientApi.Schemas.``add-card-request``(
-                                                account_id =  accountId,
-                                                account_holder_id = accountHolderId,
-                                                ``type`` = "Virtual"
-                                            )
+    let AddVirtualCard accountId accountHolderId = ClientApi.Schemas.``add-virtual-card-request``(
+                                                        account_id =  accountId,
+                                                        account_holder_id = accountHolderId,
+                                                        ``type`` = "Virtual"
+                                                    )
     let AddPhysicalCard accountId accountHolderId = ClientApi.Schemas.``add-physical-card-request``(
                                                         account_id =  accountId,
                                                         account_holder_id = accountHolderId,
