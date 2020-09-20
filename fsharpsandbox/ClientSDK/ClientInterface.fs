@@ -4,10 +4,13 @@ module ClientInterface
     open System
     open System.Net.Http
     open OpenAPITypeProvider
-     
-    type ClientApi = OpenAPIV3Provider<"/Users/etienne.pierrot/repos/issuing/openapi/src/OpenApiGenerator/output/openapi.yaml">
+    type ClientApi = OpenAPIV3Provider<"/Users/etienne.pierrot/repos/issuing/openapi/src/OpenApiGenerator/output/openapi.json">
+    type Request = AddAccount of ClientApi.Schemas.``add-account-request``
+                    | AddAccountHolder of ClientApi.Schemas.``add-individual-account-holder-request``
+                    | AddCard of ClientApi.Schemas.``add-card-request``
+                    | AddPhysicalCard of ClientApi.Schemas.``add-physical-card-request``
     
-    let executePost payload (client : HttpClient) = 
+    let executePost (payload : ObjectValue) (client : HttpClient)  = 
         let post (content : HttpContent) (client : HttpClient) (uri: string) = 
             task{
                 let! response = client.PostAsync(uri, content)
@@ -15,20 +18,36 @@ module ClientInterface
                 return contentResponse
             }
         let toHttpContent payload = new StringContent(payload, Text.Encoding.UTF8, "application/json")
-        payload |> toHttpContent |> post <| client
+        payload.ToJson() |> toHttpContent |> post <| client
 
+    let executeRequest  (client : HttpClient) (request : Request)  = 
+        let execute (payload : ObjectValue) = executePost payload client
+        match request with 
+        | AddAccount r -> execute  r  "/accounts"
+        | AddAccountHolder r -> execute r "/account-holders"
+        | AddCard r  -> execute r "/cards"
+        | AddPhysicalCard r -> execute r "/cards"
 
-    let PostAccount payload (client : HttpClient) = task { 
-            let! responseContent = executePost payload client "/accounts" 
-            return ClientApi.Schemas.``add-account-response``.Parse(responseContent)
+    let PostAccount (addAccount : ClientApi.Schemas.``add-account-request``) (client : HttpClient) = 
+        task {
+            let! jsonResult = addAccount |> AddAccount |> executeRequest client
+            return ClientApi.Schemas.``add-account-response``.Parse(jsonResult) 
+        }
+    let PostAccountHolder (addAccountHolder : ClientApi.Schemas.``add-individual-account-holder-request``) (client : HttpClient) = 
+        task {
+            let! jsonResult = addAccountHolder |> AddAccountHolder |> executeRequest client
+            return ClientApi.Schemas.``add-account-holder-response``.Parse(jsonResult) 
+        }
+     
+    let PostCard (addCard : ClientApi.Schemas.``add-card-request``) (client : HttpClient) = 
+        task {
+            let! jsonResult = addCard |> AddCard |> executeRequest client
+            return ClientApi.Schemas.``add-card-response``.Parse(jsonResult) 
+        }
+    let PostPhysicalCard (addCard : ClientApi.Schemas.``add-physical-card-request``) (client : HttpClient) = 
+        task {
+            let! jsonResult = addCard |> AddPhysicalCard |> executeRequest client
+            return ClientApi.Schemas.``add-card-response``.Parse(jsonResult) 
         }
 
-    let PostAccountHolder payload (client : HttpClient) = task { 
-            let! responseContent = executePost payload client "/account-holders" 
-            return ClientApi.Schemas.``add-account-holder-response``.Parse(responseContent)
-        }
-
-    let PostCard payload (client : HttpClient) = task {
-            let! responseContent = executePost payload client "cards"
-            return ClientApi.Schemas.``add-card-response``.Parse(responseContent)
-        }
+    

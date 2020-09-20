@@ -7,9 +7,9 @@
     <Compile Include="Cloudify/Cloudify.fs" />
     <Compile Include="ClientSDK/Oauth.fs" />
     <Compile Include="ClientSDK/ClientInterface.fs" />
+    <Compile Include="ClientSDK/SampleData.fs" />
     <Compile Include="ClientSDK/HttpClient.fs" />
     <Compile Include="ClientSDK/CardProduct.fs" />
-    <Compile Include="SampleData.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

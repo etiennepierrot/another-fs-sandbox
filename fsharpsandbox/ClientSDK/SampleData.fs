@@ -9,18 +9,28 @@ module SampleData
                         state = Some "France",
                         country = "FR")
 
+    let shippingInstructions = ClientApi.Schemas.ShippingInstruction(
+                                    shipping_address = Address
+                                )                    
+
     let AddAccount = ClientApi.Schemas.``add-account-request``("EUR",  Some "fake account")
 
     let AddAccountHolder accountId = ClientApi.Schemas.``add-individual-account-holder-request``(
-                                        account_id = Some accountId,
+                                        account_id = accountId,
                                         ``type`` = "individual",
-                                        first_name = Some "etienne",
-                                        last_name = Some "pierrot",
+                                        first_name = "etienne",
+                                        last_name = "pierrot",
                                         billing_address = Address
-                                    )                                   
+                                        )                                  
     
     let AddCard accountId accountHolderId = ClientApi.Schemas.``add-card-request``(
                                                 account_id =  accountId,
                                                 account_holder_id = accountHolderId,
                                                 ``type`` = "Virtual"
                                             )
+    let AddPhysicalCard accountId accountHolderId = ClientApi.Schemas.``add-physical-card-request``(
+                                                        account_id =  accountId,
+                                                        account_holder_id = accountHolderId,
+                                                        ``type`` = "Physical",
+                                                        shipping_instructions = shippingInstructions
+                                                    )                                        

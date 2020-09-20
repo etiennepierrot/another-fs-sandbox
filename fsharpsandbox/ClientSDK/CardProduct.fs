@@ -16,7 +16,7 @@ module CardProduct
                                         "allowed_card_types" : ["Physical", "Virtual"],
                                         "target_account_range": {
                                                     "country_code": "GB",
-                                                    "start": "535737100002003",
+                                                    "start": "535737100003003",
                                                     "end": "535737101005999",
                                                     "reference": "account range reference"
                                                 },
