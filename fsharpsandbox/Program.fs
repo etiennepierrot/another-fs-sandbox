@@ -1,55 +1,36 @@
-﻿open Cloudify
-open System
-open OAuth
-open CardProduct
-open FSharp.Control.Tasks.V2
-open ClientInterface
-open HttpClient
-open JustSaying.Messaging
-open JustSaying.Messaging.MessageHandling
+﻿open System
+open FSharp.Data
 
 
-type Handler() = 
-    interface IHandlerAsync<string> with 
-        member this.Handle s = 
-            task {
-                printfn "%s" s
-                return true
-            }
-let createCardProduct clientId = 
-        let (partnerCredential, _) =  "partner"  |> GetBasicCredentials 
-        GetAccessToken "partner" partnerCredential |> CreateCardProduct clientId
+
 
 [<EntryPoint>]
 let main argv =
-    // let (credentials, clientId) = GetBasicCredentials "client"
-    let (credentials, clientId) = (
-        "YWNrX3poaHBubHF4bnptdTdhcWVhcnJ1cWxnYXN1OjcwMjY2OGM0ZjM1ZDRkN2ZiMzc2NDE2YzIwNjk3NTEw", 
-        "cli_2tb3kpomlinebngsv5yhnrjewi")
+    let msft = CsvFile.Load("/Users/etienne.pierrot//Downloads/extract-2021-09-14_22-09-98.csv")
+    let datediff (arr :DateTime[]) =
+       let diff (d1 :DateTime) (d2 :DateTime) = d1.Subtract(d2).TotalMilliseconds |> Math.Abs
+       diff arr.[0] arr.[1]
+       
+    let values = msft.Rows
+                    |> Seq.map ( fun row -> ( row.GetColumn "@Timestamp" |> DateTime.Parse, row.GetColumn "CorrelationId"  ))
+                    |> Seq.groupBy snd
+                    |> Seq.filter(fun row -> row |> snd |> Seq.length = 2)
+                    |> Seq.map(fun row -> (fst row,  row |> snd |> Seq.map fst  |> Seq.toArray |> datediff ) ) |> Seq.map snd
+    
+    values
+        |> Seq.sort
+        |> Seq.take(int ((99.0 * float (values |> Seq.length) ) / 100.0) )
+        |> Seq.last
+        |> printfn "%f"
    
-    printfn "client_id : %s " clientId
-    printfn "credentials : %s " credentials
-    let accessToken = GetAccessToken "client" credentials
-    printfn "accessToken : %s " accessToken
-
-    let client = CreateHttpClient accessToken "http://localhost:5041/"   
-    task {
-        let addAccount = SampleData.AddAccount
-        let! account = PostAccount addAccount client
-        let addAccountHolder = SampleData.AddAccountHolder account.Id
-        let! accountHolder = PostAccountHolder addAccountHolder client 
-        let addVirtualCard = SampleData.AddVirtualCard account.Id accountHolder.Id
-        let! card = PostVirtualCard addVirtualCard client
-        let addPhysicalCard = SampleData.AddPhysicalCard account.Id accountHolder.Id
-        let! physicalCard = PostPhysicalCard addPhysicalCard client
-
-        printfn "account_id : %s" account.Id
-        printfn "account_holder_id : %s" accountHolder.Id
-        printfn "virtual card_id : %s" card.Id
-        printfn "physical card_id : %s" physicalCard.Id
-    }
-    |> Async.AwaitTask
-    |> Async.RunSynchronously    
-
-    // client.
+    
+    // Average : 353 ms
+    // Min : 190 ms
+    // Max : 952 ms
+    // Max 95p : 491 ms
+    
+    //    |> Seq.iter( fun row -> printfn $"Line: (%s{(fst row)}, %f{(snd row)} ms)" )
+//    
+//    for row in msft.Rows do
+//        printfn "Line: (%s, %s)" (row.GetColumn "@Timestamp") (row.GetColumn "CorrelationId")
     0 // return an integer exit code

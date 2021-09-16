@@ -5,16 +5,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Cloudify/Cloudify.fs" />
-    <Compile Include="ClientSDK/Oauth.fs" />
-    <Compile Include="ClientSDK/ClientInterface.fs" />
-    <Compile Include="ClientSDK/SampleData.fs" />
-    <Compile Include="ClientSDK/HttpClient.fs" />
-    <Compile Include="ClientSDK/CardProduct.fs" />
+<!--    <Compile Include="ClientSDK/Oauth.fs" />-->
+<!--    <Compile Include="ClientSDK/ClientInterface.fs" />-->
+<!--    <Compile Include="ClientSDK/SampleData.fs" />-->
+<!--    <Compile Include="ClientSDK/HttpClient.fs" />-->
+<!--    <Compile Include="ClientSDK/CardProduct.fs" />-->
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.7.2" />
-    <PackageReference Include="FSharp.Data" Version="3.3.3" />
+    <PackageReference Include="FSharp.Core" Version="5.0.2" />
+    <PackageReference Include="FSharp.Data" Version="4.2.2" />
     <PackageReference Include="SwaggerProvider" Version="0.10.7" />
     <PackageReference Include="TaskBuilder.fs" Version="2.1.0" />
     <PackageReference Include="OpenAPITypeProvider" Version="2.3.0" />

@@ -1,0 +1,1452 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Issuing API Reference",
+    "description": "# Introduction\nThe Issuing ecosystem contains many APIs, both internal and external. We have adopted a specification-first approach whereby  any changes to existing APIs or addition of new APIs start with an [OpenAPI](https://www.openapis.org/) specification.  \n\nThis approach ensures that we can get feedback from the wider team and stakeholders before any development starts and serves  as living documentation throughout the lifetime of the product.\n# Authentication\nOAuth 2.0 is an authorization protocol that gives an API client limited access to user data on a web server.  OAuth relies on authentication scenarios called flows, which allow the resource owner (user) to share the protected content from the resource server without sharing their credentials.  For that purpose, an OAuth 2.0 server issues access tokens that the client applications can use to access protected resources on behalf of the resource owner.  For more information about OAuth 2.0, see oauth.net and RFC 6749.\nIn order for interactive client to be authenticated when making requests to this API please follow the Authentication Code flow. 1. A front-channel step should manage the signin/login/consent experience etc. This step results in an authorization code that represents the outcome of the front-channel operation. 2. A back-channel step where the authorization code from step 1 gets exchanged with the requested tokens. For more information see [OAuth2 Autorization code](https://oauth.net/2/grant-types/authorization-code/)\n",
+    "termsOfService": "https://checkout.com/terms/",
+    "contact": {
+      "name": "Checkout.com Support",
+      "url": "https://checkout.com",
+      "email": "support@checkout.com"
+    },
+    "license": {
+      "name": "Checkout.com",
+      "url": "https://checkout.com/api/license/"
+    },
+    "version": "1.0.0",
+    "x-logo": {
+      "url": "https://assets.checkout.com/docs/logos/checkout-api-reference-logo.svg",
+      "backgroundColor": "#F0F3F7",
+      "altText": "Checkout.com API logo"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.checkout.com/issuing",
+      "description": "Live API"
+    },
+    {
+      "url": "https://api.sandbox.checkout.com/issuing",
+      "description": "Sandbox API"
+    }
+  ],
+  "paths": {
+    "/cardholders": {
+      "post": {
+        "tags": [
+          "Cardholders"
+        ],
+        "summary": "Add a cardholder",
+        "description": "Add a new cardholder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/add-cardholder-request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Cardholder added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/add-cardholder-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Invalid data was sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cardholders/{cardholderId}": {
+      "get": {
+        "tags": [
+          "Cardholders"
+        ],
+        "summary": "Retrieve a cardholder",
+        "description": "Retrieve an existing cardholder",
+        "parameters": [
+          {
+            "name": "cardholder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CardholderId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card holder retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get-cardholder-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Cardholder not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cards": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Add a card",
+        "description": "Add a new physical or virtual card.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/add-card-request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Card added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/add-card-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Invalid data was sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cards/{cardId}": {
+      "get": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Retrieve a card",
+        "description": "Retrieve an existing card. This endpoint will not returned sensitive information such as the PAN or CVC.",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CardId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get-card-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Card Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cards/{cardId}/activate": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Activate a card",
+        "description": "Activate a card so that its cardholder can start using it.",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CardId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card successfully activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/activate-card-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Card Not found"
+          },
+          "422": {
+            "description": "Invalid data was sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cards/{cardId}/credentials": {
+      "get": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Retrieve the card credentials",
+        "description": "Retrieve the card credentials.",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CardId"
+            }
+          },
+          {
+            "name": "credentials",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "number",
+                "cvc2"
+              ],
+              "type": "string",
+              "description": "One or more comma-separated credential fields. \nThis works like a logical *AND* operator and returns the combined crendentials in the response.\nDefaults to no credentials being returned.\n",
+              "example": "number,cvc2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card credentials retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Credentials"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Card Not found"
+          },
+          "422": {
+            "description": "Invalid data was sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cards/{cardId}/revoke": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Revoke a card",
+        "description": "Revoke a card permanently. This cannot be undone unlike the suspend action.",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CardId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/revoke-card-request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Card successfully revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/revoke-card-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Card Not found"
+          },
+          "422": {
+            "description": "Invalid data was sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    },
+    "/cards/{cardId}/suspend": {
+      "post": {
+        "tags": [
+          "Cards"
+        ],
+        "summary": "Suspend a card",
+        "description": "Suspend a card temporarily so that incoming authorizations are declined. This action can be reversed.",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CardId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/suspend-card-request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Card successfully suspended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/suspend-card-response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Card Not found"
+          },
+          "422": {
+            "description": "Invalid data was sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.checkout.com/issuing",
+            "description": "Live API"
+          },
+          {
+            "url": "https://api.sandbox.checkout.com/issuing",
+            "description": "Sandbox API"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "add-cardholder-request": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The cardholder type.",
+            "example": "individual"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/Reference"
+          }
+        },
+        "description": "The cardholder to add.",
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "individual": "#/components/schemas/add-individual-cardholder-request"
+          }
+        }
+      },
+      "add-cardholder-response": {
+        "required": [
+          "id",
+          "type",
+          "_links"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CardholderId"
+          },
+          "type": {
+            "enum": [
+              "individual"
+            ],
+            "type": "string",
+            "description": "The cardholder type."
+          },
+          "reference": {
+            "$ref": "#/components/schemas/Reference"
+          },
+          "created_date": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "last_modified_date": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2019-09-10T10:11:12Z"
+          },
+          "_links": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CardholderLinks"
+              }
+            ]
+          }
+        }
+      },
+      "add-individual-cardholder-request": {
+        "required": [
+          "first_name",
+          "last_name",
+          "billing_address"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/add-cardholder-request"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "first_name": {
+                "maxLength": 40,
+                "minLength": 1,
+                "pattern": "^[a-zA-Z'- ]{1,40}$",
+                "type": "string",
+                "description": "The cardholder first name.",
+                "example": "John"
+              },
+              "middle_name": {
+                "maxLength": 40,
+                "minLength": 1,
+                "pattern": "^[a-zA-Z'- ]{1,40}$",
+                "type": "string",
+                "description": "The cardholder middle name.",
+                "example": "Fitzgerald"
+              },
+              "last_name": {
+                "maxLength": 40,
+                "minLength": 1,
+                "pattern": "^[a-zA-Z'- ]{1,40}$",
+                "type": "string",
+                "description": "The cardholder last name.",
+                "example": "Kennedy"
+              },
+              "email": {
+                "$ref": "#/components/schemas/Email"
+              },
+              "phone_number": {
+                "$ref": "#/components/schemas/PhoneNumber"
+              },
+              "date_of_birth": {
+                "type": "string",
+                "description": "The cardholder date of birth in the YYYY-MM-DD format.",
+                "format": "date",
+                "example": "1985-05-15T00:00:00.0000000"
+              },
+              "billing_address": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "residency_address": {
+                "$ref": "#/components/schemas/Address"
+              }
+            }
+          }
+        ]
+      },
+      "get-cardholder-response": { },
+      "Cardholder": {
+        "required": [
+          "id",
+          "type",
+          "first_name",
+          "last_name",
+          "billing_address"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CardholderId"
+          },
+          "type": {
+            "type": "string",
+            "description": "The cardholder type. Currently `individual` is the only supported value.",
+            "example": "individual"
+          },
+          "first_name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z'- ]{1,40}$",
+            "type": "string",
+            "description": "The cardholder first name.",
+            "example": "John"
+          },
+          "middle_name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z'- ]{1,40}$",
+            "type": "string",
+            "description": "The cardholder middle name.",
+            "example": "Fitzgerald"
+          },
+          "last_name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z'- ]{1,40}$",
+            "type": "string",
+            "description": "The cardholder last name.",
+            "example": "Kennedy"
+          },
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          },
+          "phone_number": {
+            "$ref": "#/components/schemas/PhoneNumber"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "description": "The cardholder date of birth in the YYYY-MM-DD format.",
+            "format": "date",
+            "example": "1985-05-28T00:00:00.0000000"
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "residency_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/Reference"
+          },
+          "created_date": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2019-09-10T10:11:12Z"
+          },
+          "last_modified_date": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2019-09-11T10:11:12Z"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/CardholderLinks"
+          }
+        }
+      },
+      "CardholderLinks": {
+        "minItems": 1,
+        "required": [
+          "self"
+        ],
+        "type": "object",
+        "properties": {
+          "self": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "cards": {
+            "$ref": "#/components/schemas/Link"
+          }
+        },
+        "description": "The links related to the current cardholder",
+        "example": {
+          "self": {
+            "href": "https://api.checkout.com/issuing/cardholders/crh_d3ozhf43pcq2xbldn2g45qnb44"
+          },
+          "cards": {
+            "href": "https://api.checkout.com/issuing/cards"
+          }
+        }
+      },
+      "activate-card-response": {
+        "type": "object",
+        "properties": {
+          "_links": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivatedCardLinks"
+              }
+            ]
+          }
+        }
+      },
+      "add-card-request": {
+        "required": [
+          "type",
+          "cardholder_id"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The card type.",
+            "example": "virtual"
+          },
+          "cardholder_id": {
+            "$ref": "#/components/schemas/CardholderId"
+          },
+          "card_lifetime": {
+            "$ref": "#/components/schemas/CardLifetime"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/Reference"
+          }
+        },
+        "description": "The card to add",
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "physical": "#/components/schemas/add-physical-card-request",
+            "virtual": "#/components/schemas/add-virtual-card-request"
+          }
+        }
+      },
+      "add-card-response": {
+        "required": [
+          "id",
+          "display_name",
+          "last_four",
+          "expiry_month",
+          "expiry_year",
+          "billing_currency",
+          "issuing_country",
+          "created_date"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CardId"
+          },
+          "display_name": {
+            "$ref": "#/components/schemas/DisplayName"
+          },
+          "last_four": {
+            "$ref": "#/components/schemas/LastFour"
+          },
+          "expiry_month": {
+            "$ref": "#/components/schemas/ExpiryMonth"
+          },
+          "expiry_year": {
+            "$ref": "#/components/schemas/ExpiryYear"
+          },
+          "billing_currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "issuing_country": {
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string",
+            "description": "The two-letter <a href=\"https://docs.checkout.com/docs/country-codes\" target=\"blank\">ISO country code</a> of the issuing country",
+            "example": "US"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/Reference"
+          },
+          "created_date": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2019-09-10T10:11:12Z"
+          },
+          "_links": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CardLinks"
+              }
+            ]
+          }
+        },
+        "description": "Card details"
+      },
+      "add-physical-card-request": {
+        "required": [
+          "shipping_instructions"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/add-card-request"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "display_name": {
+                "$ref": "#/components/schemas/DisplayName"
+              },
+              "shipping_instructions": {
+                "$ref": "#/components/schemas/ShippingInstruction"
+              },
+              "activate_card": {
+                "type": "bool",
+                "description": "Choose whether you want to activate the newly created card. By default physical cards are created as inactive. Inactive cards do not accept transactions.",
+                "default": "false"
+              }
+            }
+          }
+        ]
+      },
+      "add-virtual-card-request": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/add-card-request"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "display_name": {
+                "$ref": "#/components/schemas/DisplayName"
+              },
+              "is_single_use": {
+                "type": "bool",
+                "description": "Indicates whether the virtual card can be used only one time.",
+                "default": "false"
+              },
+              "activate_card": {
+                "type": "bool",
+                "description": "Choose whether you want to activate the newly created card. By default virtual cards are created as active. Inactive cards do not accept transactions.",
+                "default": "true"
+              }
+            }
+          }
+        ]
+      },
+      "DisplayName": {
+        "maxLength": 28,
+        "minLength": 1,
+        "pattern": "^[a-zA-Z'- ]{1,28}$",
+        "type": "string",
+        "example": "JOHN KENNEDY"
+      },
+      "get-card-response": {
+        "required": [
+          "id",
+          "last_four",
+          "expiry_month",
+          "expiry_year",
+          "status",
+          "active",
+          "type",
+          "display_name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CardId"
+          },
+          "last_four": {
+            "$ref": "#/components/schemas/LastFour"
+          },
+          "expiry_month": {
+            "$ref": "#/components/schemas/ExpiryMonth"
+          },
+          "expiry_year": {
+            "$ref": "#/components/schemas/ExpiryYear"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "display_name": {
+            "$ref": "#/components/schemas/DisplayName"
+          },
+          "type": {
+            "enum": [
+              "virtual",
+              "physical"
+            ],
+            "type": "string",
+            "description": "The card type",
+            "example": "virtual"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/Reference"
+          },
+          "created_date": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2019-09-10T10:11:12Z"
+          },
+          "last_modified_date": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2019-09-11T10:11:12Z"
+          },
+          "_links": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CardLinks"
+              }
+            ]
+          }
+        },
+        "description": "Card details",
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "physical": "#/components/schemas/get-physical-card-response",
+            "virtual": "#/components/schemas/get-virtual-card-response"
+          }
+        }
+      },
+      "get-physical-card-response": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/get-card-response"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "get-virtual-card-response": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/get-card-response"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "is_single_use": {
+                "type": "bool",
+                "description": "Indicates whether the virtual card can be used only one time.",
+                "default": "false"
+              }
+            }
+          }
+        ]
+      },
+      "ActivatedCardLinks": {
+        "minItems": 1,
+        "required": [
+          "self",
+          "credentials",
+          "revoke"
+        ],
+        "type": "object",
+        "properties": {
+          "self": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "revoke": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "suspend": {
+            "$ref": "#/components/schemas/Link"
+          }
+        },
+        "description": "The links related to the card",
+        "example": {
+          "self": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491"
+          },
+          "revoke": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491/revoke"
+          },
+          "suspend": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491/suspend"
+          }
+        }
+      },
+      "CardLifetime": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "unit": {
+            "enum": [
+              "Months",
+              "Years"
+            ],
+            "type": "string",
+            "description": "The card lifetime unit",
+            "default": "Years",
+            "example": "Months"
+          },
+          "value": {
+            "type": "integer",
+            "description": "The card lifetime value in the selected unit",
+            "example": 6
+          }
+        },
+        "description": "The card lifetime during which it accepts authorisations. The selected lifetime will determine the expiry date."
+      },
+      "CardLink": {
+        "minItems": 1,
+        "required": [
+          "self"
+        ],
+        "type": "object",
+        "properties": {
+          "self": {
+            "$ref": "#/components/schemas/Link"
+          }
+        },
+        "description": "The link to the card",
+        "example": {
+          "self": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491"
+          }
+        }
+      },
+      "CardLinks": {
+        "minItems": 1,
+        "required": [
+          "self",
+          "credentials",
+          "revoke"
+        ],
+        "type": "object",
+        "properties": {
+          "self": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "credentials": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "revoke": {
+            "$ref": "#/components/schemas/Link"
+          }
+        },
+        "description": "The links related to the card",
+        "example": {
+          "self": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491"
+          },
+          "credentials": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491/credentials"
+          },
+          "revoke": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491/revoke"
+          }
+        }
+      },
+      "CardNumber": {
+        "maxLength": 16,
+        "minLength": 16,
+        "pattern": "^[0-9]{16}$",
+        "type": "string",
+        "description": "The unencrypted card number",
+        "format": "pan",
+        "example": "4242424242424242"
+      },
+      "Credentials": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "$ref": "#/components/schemas/CardNumber"
+          },
+          "cvc2": {
+            "$ref": "#/components/schemas/CVC2"
+          }
+        }
+      },
+      "CVC2": {
+        "maximum": 3,
+        "minimum": 3,
+        "pattern": "^[0-9]{3}$",
+        "type": "string",
+        "description": "The card verification code (CVC2) often referred to as the card verification value (CVV).",
+        "example": "604"
+      },
+      "ExpiryMonth": {
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer",
+        "description": "The expiry month of the card",
+        "format": "int32",
+        "example": 5
+      },
+      "ExpiryYear": {
+        "maxLength": 4,
+        "minLength": 4,
+        "type": "integer",
+        "description": "The four-digit expiry year of the card",
+        "format": "int32",
+        "example": 2025
+      },
+      "LastFour": {
+        "maximum": 4,
+        "minimum": 4,
+        "pattern": "^[0-9]{4}$",
+        "type": "string",
+        "description": "The last four digits of the card number (PAN).",
+        "example": "1234"
+      },
+      "Scheme": {
+        "enum": [
+          "mastercard",
+          "visa"
+        ],
+        "type": "string",
+        "description": "the card scheme",
+        "example": "mastercard"
+      },
+      "Status": {
+        "enum": [
+          "active",
+          "inactive",
+          "revoked",
+          "suspended"
+        ],
+        "type": "string",
+        "description": "The current card status.",
+        "example": "active"
+      },
+      "SuspendedCardLinks": {
+        "minItems": 1,
+        "required": [
+          "self",
+          "credentials",
+          "revoke"
+        ],
+        "type": "object",
+        "properties": {
+          "self": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "activate": {
+            "$ref": "#/components/schemas/Link"
+          },
+          "revoke": {
+            "$ref": "#/components/schemas/Link"
+          }
+        },
+        "description": "The links related to the card",
+        "example": {
+          "self": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491"
+          },
+          "activate": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491/activate"
+          },
+          "revoke": {
+            "href": "https://api.checkout.com/issuing/cards/crd_fa6psq42dcdd6fdn5gifcq1491/revoke"
+          }
+        }
+      },
+      "revoke-card-request": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "enum": [
+              "expired",
+              "reported_lost",
+              "reported_stolen"
+            ],
+            "type": "string",
+            "example": "reported_lost"
+          }
+        }
+      },
+      "revoke-card-response": {
+        "type": "object",
+        "properties": {
+          "_links": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CardLink"
+              }
+            ]
+          }
+        }
+      },
+      "suspend-card-request": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "enum": [
+              "suspected_lost",
+              "suspected_stolen"
+            ],
+            "type": "string",
+            "example": "suspected_lost"
+          }
+        }
+      },
+      "suspend-card-response": {
+        "type": "object",
+        "properties": {
+          "_links": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SuspendedCardLinks"
+              }
+            ]
+          }
+        }
+      },
+      "Address": {
+        "required": [
+          "address_line1",
+          "city",
+          "zip",
+          "country"
+        ],
+        "type": "object",
+        "properties": {
+          "address_line1": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string",
+            "description": "The first line of the address",
+            "example": "Checkout.com"
+          },
+          "address_line2": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string",
+            "description": "The second line of the address",
+            "example": "90 Tottenham Court Road"
+          },
+          "city": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string",
+            "description": "The address city",
+            "example": "London"
+          },
+          "state": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string",
+            "description": "The address state",
+            "example": "London"
+          },
+          "zip": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string",
+            "description": "The address zip/postal code",
+            "example": "W1T 4TJ"
+          },
+          "country": {
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string",
+            "description": "The two-letter <a href=\"https://docs.checkout.com/docs/country-codes\" target=\"blank\">ISO country code</a> of the address",
+            "example": "GB"
+          }
+        }
+      },
+      "CardholderId": {
+        "maxLength": 30,
+        "minLength": 30,
+        "pattern": "^crh_[a-z0-9]{26}$",
+        "type": "string",
+        "description": "The unique identifier of a cardholder",
+        "example": "crh_d3ozhf43pcq2xbldn2g45qnb44"
+      },
+      "CardId": {
+        "maxLength": 30,
+        "minLength": 30,
+        "pattern": "^crd_[a-z0-9]{26}$",
+        "type": "string",
+        "description": "The unique identifier of a card",
+        "example": "crd_fa6psq242dcd6fdn5gifcq1491"
+      },
+      "Currency": {
+        "maxLength": 3,
+        "minLength": 3,
+        "pattern": "^[a-zA-Z]{3}$",
+        "type": "string",
+        "description": "The three-letter <a href=\"https://docs.checkout.com/docs/currency-codes\" target=\"blank\">ISO currency code</a>",
+        "format": "ISO4217",
+        "example": "USD"
+      },
+      "Email": {
+        "maxLength": 254,
+        "minLength": 3,
+        "type": "string",
+        "description": "emails are validated against the <a href=\"https://datatracker.ietf.org/doc/html/rfc6530\">rfc6530</a> standard",
+        "format": "email",
+        "example": "john.kennedy@myemaildomain.com"
+      },
+      "Link": {
+        "required": [
+          "href"
+        ],
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string",
+            "description": "The link URL"
+          }
+        }
+      },
+      "PhoneNumber": {
+        "type": "object",
+        "properties": {
+          "country_code": {
+            "maxLength": 7,
+            "minLength": 1,
+            "type": "string",
+            "description": "The international <a href=\"https://docs.checkout.com/resources/codes/country-codes\" target=\"blank\">country calling code</a>",
+            "example": "+1"
+          },
+          "number": {
+            "maxLength": 25,
+            "minLength": 6,
+            "type": "string",
+            "description": "The phone number",
+            "example": "415 555 2671"
+          }
+        }
+      },
+      "Reference": {
+        "maxLength": 256,
+        "type": "string",
+        "description": "Your reference",
+        "example": "X-123456-N11"
+      },
+      "ShippingInstruction": {
+        "required": [
+          "shipping_recipient",
+          "shipping_address"
+        ],
+        "type": "object",
+        "properties": {
+          "shipping_recipient": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string",
+            "description": "name of the recipient",
+            "example": "john kennedy"
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "additional_comment": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "example": "0HLHPN8802NUF:00000003"
+          },
+          "error_type": {
+            "type": "string",
+            "example": "request_invalid"
+          },
+          "error_codes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "request_body_malformed"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth": {
+        "type": "oauth2",
+        "description": "For server-to-server communication we support the OAuth 2.0, client-credentials flow. \nTo authenticate you must first create an Access Key via the Checkout Issuing Hub.\nYou can then request an access token via the token URL below. \nYou must authenticate using Basic authentication providing you Access Key ID and Secret as username and password respectively:\n```\ncurl --location --request POST 'https://access(.sandbox).checkout.com/connect/token' \\\n--header 'Content-Type: application/x-www-form-urlencoded' \\\n--header 'Authorization: Basic dGVzdC1hY2Nlc3Mta2V5LWlkOnRlc3QtYWNjZXNzLWtleS1zZWNyZXQ=' \\\n--data-urlencode 'grant_type=client_credentials' \\\n--data-urlencode 'scope=issuing:client'\n```\nThe token server will return a Bearer `access_token` in JWT format that can then be provided in the `Authorization`\nheader of your API requests:\n\nWhen the access token expires you will need to request a new one, or use one of our SDKs that handle this automatically.\n",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://access.checkout.com/connect/token",
+            "scopes": {
+              "issuing:partner": "Gives access to endpoint dedicted to partners",
+              "issuing:client": "Gives access to endpoint dedicted to clients"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Config API",
+      "tags": [
+        "Cardholders",
+        "Cards"
+      ]
+    }
+  ]
+}

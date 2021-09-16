@@ -4,7 +4,7 @@ module ClientInterface
     open System
     open System.Net.Http
     open OpenAPITypeProvider
-    type ClientApi = OpenAPIV3Provider<"/Users/etienne.pierrot/repos/issuing/openapi/src/OpenApiGenerator/output/openapi.json">
+    type ClientApi = OpenAPIV3Provider<"openapi.json">
     
     let executePost (client : HttpClient) (payload : ObjectValue)  = 
         let post (content : HttpContent) (client : HttpClient) (uri: string) = 
