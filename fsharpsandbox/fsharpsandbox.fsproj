@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>.NET5</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Cloudify/Cloudify.fs" />
-<!--    <Compile Include="ClientSDK/Oauth.fs" />-->
-<!--    <Compile Include="ClientSDK/ClientInterface.fs" />-->
-<!--    <Compile Include="ClientSDK/SampleData.fs" />-->
-<!--    <Compile Include="ClientSDK/HttpClient.fs" />-->
-<!--    <Compile Include="ClientSDK/CardProduct.fs" />-->
+    <!--    <Compile Include="ClientSDK/Oauth.fs" />-->
+    <!--    <Compile Include="ClientSDK/ClientInterface.fs" />-->
+    <!--    <Compile Include="ClientSDK/SampleData.fs" />-->
+    <!--    <Compile Include="ClientSDK/HttpClient.fs" />-->
+    <!--    <Compile Include="ClientSDK/CardProduct.fs" />-->
+    <Compile Include="Parser.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
