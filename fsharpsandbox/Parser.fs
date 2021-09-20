@@ -26,9 +26,10 @@ module Parser
 
     let CalculateStat (traces  :seq<DataTrace>) = 
         let percentile (percentile :float) (values :seq<float>) = 
+            let percent totalSample = int ((percentile * float (totalSample) ) / 100.0)
             values
             |> Seq.sort
-            |> Seq.take(int ((percentile * float (values |> Seq.length) ) / 100.0) )
+            |> Seq.take( (values |> Seq.length) |> percent )
             |> Seq.last
 
         let ``p95`` = percentile 95.0
